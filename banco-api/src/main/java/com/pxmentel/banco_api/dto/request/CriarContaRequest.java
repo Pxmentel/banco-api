@@ -27,4 +27,16 @@ public class CriarContaRequest {
   public String getDocumentoCliente() {
     return documentoCliente;
   }
+
+  public void setNumero(String numero) {
+    this.numero = numero;
+  }
+
+  public void setNomeCliente(String nomeCliente) {
+    this.nomeCliente = nomeCliente;
+  }
+
+  public void setDocumentoCliente(String documentoCliente) {
+    this.documentoCliente = documentoCliente;
+  }
 }
