@@ -126,4 +126,18 @@ public class BancoService {
 
     return conta;
   }
+
+  public void transferir(String origem, String destino, double valor) {
+
+    if (valor <= 0) {
+      throw new IllegalArgumentException("Valor inválido");
+    }
+
+    Conta contaOrigem = buscarConta(origem);
+    Conta contaDestino = buscarConta(destino);
+
+    contaOrigem.sacar(valor);
+    contaDestino.depositar(valor);
+  }
+
 }

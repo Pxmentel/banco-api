@@ -3,6 +3,7 @@ package com.pxmentel.banco_api.controller;
 import com.pxmentel.banco_api.domain.entity.Conta;
 import com.pxmentel.banco_api.dto.request.CriarContaRequest;
 import com.pxmentel.banco_api.dto.request.DepositoRequest;
+import com.pxmentel.banco_api.dto.request.TransferenciaRequest;
 import com.pxmentel.banco_api.dto.response.ContaResponse;
 import com.pxmentel.banco_api.mapper.ContaMapper;
 import com.pxmentel.banco_api.service.BancoService;
@@ -100,4 +101,19 @@ public class BancoController {
         ContaMapper.toResponse(conta)
     );
   }
+
+  @PostMapping("/contas/transferencia")
+  public ResponseEntity<Void> transferir(
+      @Valid @RequestBody TransferenciaRequest request
+  ) {
+
+    bancoService.transferir(
+        request.getContaOrigem(),
+        request.getContaDestino(),
+        request.getValor()
+    );
+
+    return ResponseEntity.ok().build();
+  }
+
 }
