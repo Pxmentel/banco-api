@@ -3,6 +3,7 @@ package com.pxmentel.banco_api.controller;
 import com.pxmentel.banco_api.domain.entity.Conta;
 import com.pxmentel.banco_api.dto.request.CriarContaRequest;
 import com.pxmentel.banco_api.dto.request.DepositoRequest;
+import com.pxmentel.banco_api.dto.request.SaqueRequest;
 import com.pxmentel.banco_api.dto.request.TransferenciaRequest;
 import com.pxmentel.banco_api.dto.response.ContaResponse;
 import com.pxmentel.banco_api.mapper.ContaMapper;
@@ -92,7 +93,7 @@ public class BancoController {
   @PostMapping("/contas/{numero}/saque")
   public ResponseEntity<ContaResponse> sacar(
       @PathVariable String numero,
-      @Valid @RequestBody DepositoRequest request
+      @Valid @RequestBody SaqueRequest request
   ) {
 
     Conta conta = bancoService.sacar(numero, request.getValor());
