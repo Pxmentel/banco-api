@@ -1,9 +1,15 @@
 package com.pxmentel.banco_api.dto.request;
 
+import com.pxmentel.banco_api.domain.enumm.TipoConta;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class CriarContaRequest {
   @NotBlank(message = "Número da conta é obrigatório")
   private String numero;
@@ -16,27 +22,9 @@ public class CriarContaRequest {
   @NotBlank(message = "Documento do cliente é obrigatório")
   private String documentoCliente;
 
-  public String getNumero() {
-    return numero;
-  }
+  @NotNull(message = "Tipo da conta é obrigatório")
+  private TipoConta tipo;
 
-  public String getNomeCliente() {
-    return nomeCliente;
-  }
-
-  public String getDocumentoCliente() {
-    return documentoCliente;
-  }
-
-  public void setNumero(String numero) {
-    this.numero = numero;
-  }
-
-  public void setNomeCliente(String nomeCliente) {
-    this.nomeCliente = nomeCliente;
-  }
-
-  public void setDocumentoCliente(String documentoCliente) {
-    this.documentoCliente = documentoCliente;
-  }
+  private Double limite;
+  private Double taxaRendimento;
 }

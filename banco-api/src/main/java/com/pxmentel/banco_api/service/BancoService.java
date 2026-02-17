@@ -3,136 +3,95 @@ package com.pxmentel.banco_api.service;
 import com.pxmentel.banco_api.domain.entity.Cliente;
 import com.pxmentel.banco_api.domain.entity.Conta;
 import com.pxmentel.banco_api.domain.entity.ContaCorrente;
+import com.pxmentel.banco_api.domain.entity.ContaPoupanca;
+import com.pxmentel.banco_api.domain.enumm.TipoConta;
 import com.pxmentel.banco_api.exception.ContaNaoEncontradaException;
 import com.pxmentel.banco_api.dto.request.CriarContaRequest;
+import com.pxmentel.banco_api.repository.ClienteRepository;
+import com.pxmentel.banco_api.repository.ContaRepository; // Importar o novo repository
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class BancoService {
-  private final Map<String, Conta> contas;
-  private final Map<String, Cliente> clientes;
 
-  public BancoService() {
-    this.contas = new HashMap<>();
-    this.clientes = new HashMap<>();
+  private final ClienteRepository clienteRepository;
+  private final ContaRepository contaRepository; // Substitui o Map
+
+  public BancoService(ClienteRepository clienteRepository, ContaRepository contaRepository) {
+    this.clienteRepository = clienteRepository;
+    this.contaRepository = contaRepository;
   }
 
-  public Conta criarConta (CriarContaRequest request) {
-    //Valida se request é vazia
-    if (request == null) {
-      throw new IllegalArgumentException("Dados da conta são obrigatórios");
-    }
+  @Transactional
+  public Conta criarConta(CriarContaRequest request) {
+    if (request == null) throw new IllegalArgumentException("Dados inválidos");
 
-    Cliente cliente = clientes.get(request.getDocumentoCliente());
-
-    //Valida se o cliente já existe e se ele existir vai atribuir o cliente
-    if (cliente == null){
-      cliente = new Cliente(
-          request.getNomeCliente(),
-          request.getDocumentoCliente()
-      );
-      clientes.put(cliente.getCpf(), cliente);
-    }
-
-    //Valida se a conta já existe
-    if (contas.containsKey(request.getNumero())) {
+    if (contaRepository.existsByNumero(request.getNumero())) {
       throw new IllegalArgumentException("Conta já existe");
     }
 
-    //Criar Conta caso não exista
-    Conta conta = new ContaCorrente(
-        request.getNumero(),
-        cliente
-    );
+    Cliente cliente = clienteRepository.findByCpf(request.getDocumentoCliente())
+        .orElseGet(() -> {
+          Cliente novoCliente = new Cliente(request.getNomeCliente(), request.getDocumentoCliente());
+          return clienteRepository.save(novoCliente);
+        });
 
-    contas.put(conta.getNumero(), conta);
+    Conta conta;
 
-    return conta;
-  }
-
-  public Conta buscarConta (String numero) {
-    Conta conta = contas.get(numero);
-
-    if (conta == null){
-      throw new ContaNaoEncontradaException(
-          "Conta não encontrada: " + numero
-      );
+    if (request.getTipo() == TipoConta.CORRENTE) {
+      ContaCorrente cc = new ContaCorrente();
+      cc.setLimite(request.getLimite());
+      conta = cc;
+    } else if (request.getTipo() == TipoConta.POUPANCA) {
+      ContaPoupanca cp = new ContaPoupanca();
+      cp.setTaxaRendimento(request.getTaxaRendimento());
+      conta = cp;
+    } else {
+      throw new IllegalArgumentException("Tipo de conta inválido");
     }
 
-    return conta;
+
+    conta.setNumero(request.getNumero());
+    conta.setCliente(cliente);
+    conta.setSaldo(0.0);
+
+    return contaRepository.save(conta);
   }
 
-  public double saldoTotal() {
-    double total = 0.0;
-
-    for (Conta conta : contas.values()) {
-      total += conta.getSaldo();
-    }
-
-    return total;
+  public Conta buscarConta(String numero) {
+    return contaRepository.findByNumero(numero)
+        .orElseThrow(() -> new ContaNaoEncontradaException("Conta não encontrada: " + numero));
   }
 
   public List<Conta> listarContas() {
-    return new ArrayList<>(contas.values());
+    return contaRepository.findAll();
   }
 
   public int quantidadeDeContas() {
-    return contas.size();
+    return (int) contaRepository.count();
   }
 
-  public Conta contaComMaiorSaldo() {
-    double saldoDaConta = 0.0;
-    Conta contaMaiorSaldo = null;
-
-    for (Conta conta : contas.values()){
-      if (contas.isEmpty()){
-        throw new IllegalArgumentException("Não existem contas cadastradas");
-      }
-      if (saldoDaConta < conta.getSaldo()){
-        saldoDaConta = conta.getSaldo();
-        contaMaiorSaldo = conta;
-      }
-    }
-    return contaMaiorSaldo;
-  }
-
-  public List<Conta> contasComSaldoMinimo(double valorMinimo) {
-    List<Conta> contasValidas = new ArrayList<>();
-    for (Conta conta : contas.values()){
-      if (conta.getSaldo() >= valorMinimo){
-        contasValidas.add(conta);
-      }
-    }
-    return contasValidas;
-  }
-
+  @Transactional
   public Conta depositar(String numeroConta, double valor) {
     Conta conta = buscarConta(numeroConta);
-
-    conta.depositar(valor);
-
-    return conta;
+    conta.setSaldo(conta.getSaldo() + valor);
+    return contaRepository.save(conta); // Atualiza no banco
   }
 
+  @Transactional
   public Conta sacar(String numeroConta, double valor) {
     Conta conta = buscarConta(numeroConta);
+    if (conta.getSaldo() < valor) throw new IllegalArgumentException("Saldo insuficiente");
 
-    conta.sacar(valor);
-
-    return conta;
+    conta.setSaldo(conta.getSaldo() - valor);
+    return contaRepository.save(conta);
   }
 
+  @Transactional
   public void transferir(String origem, String destino, double valor) {
-
-    if (valor <= 0) {
-      throw new IllegalArgumentException("Valor inválido");
-    }
-
     Conta contaOrigem = buscarConta(origem);
     Conta contaDestino = buscarConta(destino);
 
@@ -140,4 +99,20 @@ public class BancoService {
     contaDestino.depositar(valor);
   }
 
+  // 1. Saldo Total (Muito mais performático!)
+  public double saldoTotal() {
+    Double total = contaRepository.sumAllSaldos();
+    return total != null ? total : 0.0;
+  }
+
+  // 2. Conta com maior saldo (O banco já traz a correta)
+  public Conta contaComMaiorSaldo() {
+    return contaRepository.findTopByOrderBySaldoDesc()
+        .orElseThrow(() -> new IllegalArgumentException("Não existem contas cadastradas"));
+  }
+
+  // 3. Contas com saldo mínimo (Filtro feito pelo banco)
+  public List<Conta> contasComSaldoMinimo(double valorMinimo) {
+    return contaRepository.findBySaldoGreaterThanEqual(valorMinimo);
+  }
 }
