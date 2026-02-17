@@ -1,108 +1,78 @@
 # Banco API 💰
 
-A simple banking REST API built with Spring Boot to practice backend fundamentals such as layered architecture, DTOs, validation, exception handling, and unit testing.
+A robust banking REST API built with **Spring Boot 3** to demonstrate advanced backend concepts, data persistence, and software architecture.
 
-This project simulates bank account operations using in-memory storage (`Map` / `List`) — no database — focusing on core Java and API design skills.
+This project evolved from an in-memory simulation to a production-ready persistent solution using **PostgreSQL**, exploring polymorphism and database inheritance mapping.
 
 ---
 
 ## 🚀 Tech Stack
 
-* Java 17
-* Spring Boot 3
-* Maven
-* Bean Validation
-* JUnit / Mockito
-* Swagger (OpenAPI)
+* **Language:** Java 17
+* **Framework:** Spring Boot 3.3.5
+* **Persistence:** Spring Data JPA / Hibernate
+* **Database:** PostgreSQL
+* **Productivity:** Lombok
+* **Documentation:** Swagger (OpenAPI)
+* **Validation:** Bean Validation (Hibernate Validator)
 
 ---
 
-## 📦 Features
+## 🏗️ Architecture & Technical Highlights
 
-* Create account
-* List accounts
-* Search account by number
-* Deposit
-* Withdraw
-* Transfer between accounts
-* Total balance calculation
-* Account statistics (count, highest balance, filters)
-* DTO mapping
-* Global exception handling
-* Input validation
-* Unit tests
+### 🧬 Inheritance Mapping (JPA)
+Utilizes the **InheritanceType.SINGLE_TABLE** strategy to manage different account types (`CheckingAccount` and `SavingsAccount`) within a single table using a discriminator column. This showcases:
+* Database and application-level polymorphism.
+* Encapsulation of specific business rules (e.g., overdraft limits exclusive to Checking Accounts).
+
+### 📊 Performance with JPQL
+Implemented custom queries using **@Query** and **Derived Query Methods** to delegate financial calculations to the database engine (such as total balance across all accounts), ensuring scalability and memory efficiency.
+
+### 🛡️ Reliability & Security
+* **Global Exception Handling:** Centralized error management, converting business exceptions into semantic HTTP responses (400, 404, etc.).
+* **Transactional Integrity:** Use of `@Transactional` to ensure atomicity in critical operations like transfers, with automatic rollback on failures.
+
+---
+
+## 📦 Core Features
+
+* **Account Management:** Dynamic creation of Checking or Savings accounts via a single endpoint.
+* **Banking Operations:** Deposit, Withdrawal, and Transfer with strict validation rules.
+* **Financial Statistics:** Total balance calculation, highest balance search, and minimum balance filters.
+* **Relationships:** `Many-to-One` mapping between Accounts and Clients with cascading persistence.
 
 ---
 
 ## ▶️ Running the Project
 
-### 1️⃣ Clone repository
+### 1️⃣ Prerequisites
+* Java 17+
+* PostgreSQL running locally
 
-```bash
-git clone https://github.com/Pxmentel/banco-api.git
-cd banco-api
+### 2️⃣ Database Configuration
+In `src/main/resources/application.properties`, set your credentials:
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/your_db
+spring.datasource.username=your_user
+spring.datasource.password=your_password
+spring.jpa.hibernate.ddl-auto=update
 ```
-
-### 2️⃣ Run the application
-
-Using Maven Wrapper:
-
-```bash
+### 3️⃣ Execution
+```
 ./mvnw spring-boot:run
 ```
 
-Application will start at:
-
-```
-http://localhost:8080
-```
-
----
-
 ## 📘 API Documentation
+Access and test endpoints via Swagger UI:
+`http://localhost:8080/swagger-ui.html`
 
-Swagger UI available at:
+## 📌 Roadmap (Next Challenges)
+[ ] Security: Spring Security + JWT implementation.
 
-```
-http://localhost:8080/swagger-ui.html
-```
+[ ] Containerization: Dockerizing application and database.
 
----
-
-## 🧪 Running Tests
-
-```bash
-./mvnw test
-```
-
----
-
-## 🧠 Project Purpose
-
-This project was developed as a learning exercise to strengthen:
-
-* Object-oriented design
-* REST API structure
-* Service layer logic
-* Exception handling
-* Clean code practices
-* Testing fundamentals
-
----
-
-## 📌 Future Improvements
-
-* Persist data with PostgreSQL
-* Authentication (Spring Security + JWT)
-* Docker containerization
-* Integration tests
-* CI/CD pipeline
-
----
+[ ] Quality: CI/CD Pipeline with GitHub Actions.
 
 ## 👨‍💻 Author
-
-Vinicius Pimentel
-GitHub: https://github.com/Pxmentel
-
----
+Vinicius Pimentel da Silva
+* GitHub: Pxmentel
