@@ -3,7 +3,7 @@ package com.pxmentel.banco_api.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
-public class TransferenciaRequest {
+public class TransferRequest {
 
   @NotBlank
   private String contaOrigem;

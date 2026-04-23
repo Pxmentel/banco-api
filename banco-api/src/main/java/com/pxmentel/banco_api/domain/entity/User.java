@@ -14,30 +14,41 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Cliente {
+public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String nome;
+  private String name;
   private String cpf;
-  public Cliente (String nome, String cpf){
-    if (nome == null || nome.isBlank()){
+  private String password;
+
+  public User(String name, String cpf){
+    if (name == null || name.isBlank()){
       throw new IllegalArgumentException("Nome é obrigatório");
     }
     if (cpf == null || cpf.isBlank()){
       throw new IllegalArgumentException("CPF é obrigatório");
     }
-    this.nome = nome;
+    this.name = name;
     this.cpf = cpf;
   }
 
-  public String getNome() {
-    return nome;
+  public String getName() {
+    return name;
   }
 
   public String getCpf() {
     return cpf;
   }
+
+  public String getUserName() {
+    return cpf;
+  }
+
+  public String getAuthorities() {
+    return null;
+  }
+
 }

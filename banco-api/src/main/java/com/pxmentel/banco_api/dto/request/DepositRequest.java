@@ -1,13 +1,14 @@
 package com.pxmentel.banco_api.dto.request;
 
 import jakarta.validation.constraints.Positive;
+import lombok.Getter;
+import lombok.Setter;
 
-public class DepositoRequest {
+@Getter
+@Setter
+public class DepositRequest {
 
   @Positive(message = "O valor deve ser maior que zero")
-  private double valor;
+  private double value;
 
-  public double getValor() {
-    return valor;
-  }
 }

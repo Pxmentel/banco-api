@@ -1,5 +1,4 @@
 package com.pxmentel.banco_api.exception;
-import com.pxmentel.banco_api.exception.ContaNaoEncontradaException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,9 +27,9 @@ public class GlobalExceptionHandler {
         .body(erros);
   }
 
-  @ExceptionHandler(ContaNaoEncontradaException.class)
+  @ExceptionHandler(AccountNotFoundException.class)
   public ResponseEntity<String> handleContaNaoEncontrada(
-      ContaNaoEncontradaException ex
+      AccountNotFoundException ex
   ) {
 
     return ResponseEntity

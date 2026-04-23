@@ -11,15 +11,15 @@ import java.util.Map;
 
 @ControllerAdvice
 public class ApiExceptionHandler {
-  @ExceptionHandler(ContaNaoEncontradaException.class)
+  @ExceptionHandler(AccountNotFoundException.class)
   public ResponseEntity<Map<String, Object>> handleContaNaoEncontrada(
-      ContaNaoEncontradaException ex
+      AccountNotFoundException ex
   ) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
         Map.of(
             "timestamp", LocalDateTime.now(),
             "status", 404,
-            "error", "Conta não encontrada",
+            "error", "Account não encontrada",
             "message", ex.getMessage()
         )
     );

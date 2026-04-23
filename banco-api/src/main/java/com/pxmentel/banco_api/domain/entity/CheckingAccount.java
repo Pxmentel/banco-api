@@ -10,15 +10,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@DiscriminatorValue("CORRENTE")
-public class ContaCorrente extends Conta {
-  private Double limite;
+@DiscriminatorValue("CHECKING")
+public class CheckingAccount extends Account {
+  private Double accountLimit;
 
   @Override
-  public void sacar(double valor) {
-    if ((getSaldo() + this.limite) < valor) {
+  public void withdraw(double value) {
+    if ((getBalance() + this.accountLimit) < value) {
       throw new IllegalArgumentException("Saldo e limite insuficientes");
     }
-    setSaldo(getSaldo() - valor);
+    setBalance(getBalance() - value);
   }
 }
