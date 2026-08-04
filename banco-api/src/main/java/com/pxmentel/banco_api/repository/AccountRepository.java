@@ -15,10 +15,10 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
   boolean existsByAccountNumber(String accountNumber);
 
-  @Query("SELECT SUM(c.saldo) FROM Account c")
+  @Query("SELECT SUM(c.balance) FROM Account c")
   Double sumAllBalances();
 
-  @Query("SELECT c FROM Account c ORDER BY c.saldo DESC LIMIT 1")
+  @Query("SELECT c FROM Account c ORDER BY c.balance DESC LIMIT 1")
   Optional<Account> findTopByOrderByBalanceDesc();
 
   List<Account> findByBalanceGreaterThanEqual(double minimumValue);
